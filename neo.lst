@@ -1,0 +1,169 @@
+.include "msp430g2553.inc"
+
+.msp430
+
+.org 0xC000
+
+start:
+mov.w #WDTPW|WDTHOLD, &WDTCTL
+
+0xc000: 0x40b2 mov.w #0x5a80, &0x0120                   cycles: 5
+0xc002: 0x5a80
+0xc004: 0x0120
+
+;calibration 16Mh
+mov.b &CALBC1_16MHZ, &BCSCTL1
+
+0xc006: 0x42d2 mov.b &0x10f9, &0x0057                   cycles: 6
+0xc008: 0x10f9
+0xc00a: 0x0057
+
+mov.b &CALDCO_16MHZ, &DCOCTL
+
+0xc00c: 0x42d2 mov.b &0x10f8, &0x0056                   cycles: 6
+0xc00e: 0x10f8
+0xc010: 0x0056
+
+
+
+
+mov.b #0x01, &P2DIR
+
+0xc012: 0x43d2 mov.b #1, &0x002a                        cycles: 4
+0xc014: 0x002a
+
+mov.b #0x00, &P2OUT
+
+0xc016: 0x43c2 mov.b #0, &0x0029                        cycles: 4
+0xc018: 0x0029
+
+
+neo1:
+mov #8 , R8
+
+0xc01a: 0x4238 mov.w #8, r8                             cycles: 1
+
+mov #3 , R7
+
+0xc01c: 0x4037 mov.w #0x0003, r7                        cycles: 2
+0xc01e: 0x0003
+
+bcl:
+bis.b  #0x01, &P2OUT   ; mise a 1
+
+0xc020: 0xd3d2 bis.b #1, &0x0029                        cycles: 4
+0xc022: 0x0029
+
+nop 
+
+0xc024: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc026: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc028: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc02a: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc02c: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc02e: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc030: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc032: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+
+bic.b  #0x01, &P2OUT   ; mise a 0
+
+0xc034: 0xc3d2 bic.b #1, &0x0029                        cycles: 4
+0xc036: 0x0029
+
+nop
+
+0xc038: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+nop
+
+0xc03a: 0x4303 nop   --  mov.w #0, CG                   cycles: 1
+
+
+dec R8
+
+0xc03c: 0x8318 sub.w #1, r8                             cycles: 1
+
+jnz bcl
+
+0xc03e: 0x23f0 jne 0xc020  (offset: -32)                cycles: 2
+
+
+;mov  #1,R6
+;tmp1:
+;dec R6
+;jnz tmp1
+
+dec R7
+
+0xc040: 0x8317 sub.w #1, r7                             cycles: 1
+
+jnz bcl
+
+0xc042: 0x23ee jne 0xc020  (offset: -36)                cycles: 2
+
+
+
+bl:
+mov #6000,R9
+
+0xc044: 0x4039 mov.w #0x1770, r9                        cycles: 2
+0xc046: 0x1770
+
+tmp:
+dec R9
+
+0xc048: 0x8319 sub.w #1, r9                             cycles: 1
+
+jnz tmp
+
+0xc04a: 0x23fe jne 0xc048  (offset: -4)                 cycles: 2
+
+
+
+jmp neo1 
+
+0xc04c: 0x3fe6 jmp 0xc01a  (offset: -52)                cycles: 2
+
+
+.org 0xFFFE
+dw start
+
+
+
+
+
+data sections:
+fffe: 00 c0                                            ..
+
+
+Program Info:
+Include Paths: .
+               /usr/local/share/naken_asm/include
+ Instructions: 27
+   Code Bytes: 78
+   Data Bytes: 2
+  Low Address: c000 (49152)
+ High Address: ffff (65535)
+
